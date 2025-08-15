@@ -1,17 +1,32 @@
 class Solution {
     public int[] frequencySort(int[] nums) {
-        
-          int[] count = new int[201];
-        for (int num : nums) {
-            count[num + 100]++;
-        }
-        Integer[] numsArr = Arrays.stream(nums).boxed().toArray(Integer[]::new);
-        Arrays.sort(numsArr, (a, b) -> {
-            if (count[a + 100] == count[b + 100]) {
-                return b - a;
-            }
-            return count[a + 100] - count[b + 100];
-        });
-        return Arrays.stream(numsArr).mapToInt(Integer::intValue).toArray();
+    Map<Integer, Integer> freq = new HashMap<>();
+    for (int num : nums) {
+      freq.put(num, freq.getOrDefault(num, 0) + 1);
     }
+
+    // Java's Arrays.sort method doesn't directly support
+    // sorting primitive arrays (int[]) with a lambda comparator.
+    // We can convert the primitive int into Integer objects
+    // to get around this limitation.
+    Integer[] numsObj = new Integer[nums.length];
+    for (int i = 0; i < nums.length; i++) {
+      numsObj[i] = nums[i];
     }
+
+    Arrays.sort(numsObj, (a, b) -> {
+      if (freq.get(a).equals(freq.get(b))) {
+        return Integer.compare(b, a);
+      }
+      return Integer.compare(freq.get(a), freq.get(b));
+    });
+
+    // Convert numsObj back to a primitive array to match
+    // return type.
+    for (int i = 0; i < nums.length; i++) {
+      nums[i] = numsObj[i];
+    }
+
+    return nums;
+  }
+}
